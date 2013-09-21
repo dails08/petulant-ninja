@@ -1,0 +1,12 @@
+
+L5RPack1.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+goBoard
+  rotate: false
+  xy: 1, 1
+  size: 2000, 2000
+  orig: 2000, 2000
+  offset: 0, 0
+  index: -1
