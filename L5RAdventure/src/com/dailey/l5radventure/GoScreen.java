@@ -19,8 +19,7 @@ public class GoScreen implements Screen{
 	
 	TextureAtlas goAtlas;
 	SpriteBatch batch;
-	Sprite goBoard;
-	GoGame currentGame;
+	GoBoard board;;
 	Process gnugo=null;		//gnugo ai, must support GTP
 	BufferedReader processOutput;
 	BufferedReader processError;
@@ -45,7 +44,7 @@ public class GoScreen implements Screen{
 
 		batch.begin();
 		
-		goBoard.draw(batch);
+		board.draw(batch);
 		
 		batch.end();
 		//Gdx.app.log(L5RGame.LOG, "...rendered.");
@@ -64,12 +63,11 @@ public class GoScreen implements Screen{
 		Gdx.app.log(L5RGame.LOG, "Showing...");
 		batch = new SpriteBatch();
 		goAtlas = new TextureAtlas("data/L5RPack1.pack");
-		goBoard = goAtlas.createSprite("goBoard");
-		goBoard.setSize(700,700);
-		goBoard.setPosition(Gdx.graphics.getWidth()/2-goBoard.getWidth()/2, (Gdx.graphics.getHeight()-goBoard.getHeight())/2);
-		currentGame = new GoGame();
 		
 		Gdx.app.log("GoScreen", System.getProperty("os.name").toLowerCase());
+		
+		board = new GoBoard(goAtlas);
+		Gdx.input.setInputProcessor(board);
 		
 		try {
 			gnugo = Runtime.getRuntime().exec("gnugo --mode gtp");
@@ -91,6 +89,8 @@ public class GoScreen implements Screen{
 		try {
 			Gdx.app.log("GoScreen", "Writing to gnugo...");
 			processInput.write("showboard\n");
+			processInput.flush();
+			processInput.write("estimate_score\n");
 			processInput.flush();
 			Gdx.app.log("GoScreen", "...written.");
 			} catch (IOException e) {

@@ -3,10 +3,24 @@ L5RPack1.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-goBoard
+goban
   rotate: false
-  xy: 1, 1
+  xy: 1, 47
   size: 2000, 2000
   orig: 2000, 2000
+  offset: 0, 0
+  index: -1
+whitestone
+  rotate: false
+  xy: 1, 1
+  size: 44, 44
+  orig: 44, 44
+  offset: 0, 0
+  index: -1
+blackstone
+  rotate: false
+  xy: 2003, 2003
+  size: 44, 44
+  orig: 44, 44
   offset: 0, 0
   index: -1
