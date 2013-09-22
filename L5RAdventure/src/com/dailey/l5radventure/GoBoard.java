@@ -20,10 +20,14 @@ public class GoBoard implements InputProcessor{
 		{
 			if (game.blacksTurn)
 			{
+				
 				//blackstone.setPosition(pX-blackstone.getWidth()/2, pY-blackstone.getHeight()/2);
-				float stoneX = pX-blackstone.getWidth()/2;
-				float stoneY = pY-blackstone.getHeight()/2;
-				blackstone.setPosition(getX()+(float)(Math.floor(stoneX/getWidth()/19)*(getWidth()/19)+.5*stoneSize()), getY()+(float)(Math.floor(stoneY/getHeight()/19)*(getHeight()/19)+.5*stoneSize()));
+				//float stoneX = pX-blackstone.getWidth()/2;
+				//float stoneY = pY-blackstone.getHeight()/2;
+				//blackstone.setPosition(stoneX, stoneY);
+				float divisionWidth = getWidth()/19;
+				float divisionHeight = getHeight()/19;
+				blackstone.setPosition((float)(Math.floor(pX/divisionWidth)*divisionWidth), (float)(Math.floor(pY/divisionHeight)*divisionHeight));
 				blackstone.draw(batch);
 			}
 			else
