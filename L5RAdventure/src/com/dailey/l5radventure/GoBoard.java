@@ -23,20 +23,20 @@ public class GoBoard implements InputProcessor{
 	public void draw(SpriteBatch batch)
 	{
 		goban.draw(batch);
-		float divisionWidth = getWidth()/19;
-		float divisionHeight = getHeight()/19;
+		float divisionWidth = getWidth()/19f;
+		float divisionHeight = getHeight()/19f;
 		for (int i = 0; i < 19;i++)
 		{
 			for (int j = 0; j < 19; j++)
 			{
 				if (game.getCoord(i, j)==1)
 				{
-					blackstone.setPosition(i*divisionHeight+divisionHeight/2, j*divisionWidth+divisionWidth/2);
+					blackstone.setPosition(i*divisionHeight, j*divisionWidth);
 					blackstone.draw(batch);
 				}
 				else if (game.getCoord(i, j)==2)
 				{
-					whitestone.setPosition(i*divisionHeight+divisionHeight/2, j*divisionWidth+divisionWidth/2);
+					whitestone.setPosition(i*divisionHeight, j*divisionWidth);
 					whitestone.draw(batch);
 				}
 				else
@@ -46,10 +46,12 @@ public class GoBoard implements InputProcessor{
 		}
 		if (goban.getBoundingRectangle().contains(pX, pY))
 		{
-			blackstone.setPosition((float)(Math.floor(pX/divisionWidth)*divisionWidth), (float)(Math.floor(pY/divisionHeight)*divisionHeight));	
-
+				
 			if (game.blacksTurn)
+			{
+				blackstone.setPosition((float)(Math.floor(pX/divisionWidth)*divisionWidth), (float)(Math.floor(pY/divisionHeight)*divisionHeight));
 				blackstone.draw(batch);
+			}
 			else
 			{
 				assert !game.blacksTurn;
@@ -86,7 +88,20 @@ public class GoBoard implements InputProcessor{
 	
 	
 	
+	private int[] translateMouseToCoords()
+	{
+		int[] coords = new int[2];
+		
+		float divisionWidth = getWidth()/19;
+		float divisionHeight = getHeight()/19;
+		coords[0]=(int)(Math.floor(pX/divisionWidth));
+		coords[1]=(int)(Math.floor(pY/divisionHeight));	
+
+		
+		return coords;
+	}
 	
+
 	
 	public float stoneSize()
 	{
@@ -150,11 +165,23 @@ public class GoBoard implements InputProcessor{
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) 
 	{
+		Gdx.app.log("GoBoard", "Width = "+getWidth());
+		Gdx.app.log("GoBoard", "Height = "+getHeight());
+		float divisionWidth = getWidth()/19f;
+		float divisionHeight = getHeight()/19f;
+		Gdx.app.log("GoBoard", "divisionWidth = "+divisionWidth);
+		Gdx.app.log("GoBoard", "divisionHeight = "+divisionHeight);
+		
 		if (game.blacksTurn)
 		{
-			int tempX = (int)(blackstone.getX()/(getWidth()/19));
+			Gdx.app.log("GoBoard", "blackstone.x = "+blackstone.getX());
+			int tempX = (int)Math.round(blackstone.getX()/divisionWidth);
+			Gdx.app.log("GoBoard", "tempX = "+tempX);
 			char transX = (char) (tempX+65);
-			int tempY = (int)(blackstone.getY()/(getHeight()/19)) + 1;
+			Gdx.app.log("GoBoard", "transX = "+transX);
+			Gdx.app.log("GoBoard", "blackstone.y = "+blackstone.getY());
+			int tempY = (int)(Math.round((blackstone.getY()/divisionHeight)) + 1);
+			Gdx.app.log("GoBoard", "tempY = "+tempY);
 			try {
 				String command = "play black "+transX+""+tempY+"\n";
 				Gdx.app.log("GoBoard", "Sending to goEngine: "+command);
@@ -168,14 +195,16 @@ public class GoBoard implements InputProcessor{
 					pInput.flush();
 					if (getNext().contains("="))
 					{
-						Gdx.app.log("GoBoard", "Sending to goEngine: showboard");
-						pInput.write("showboard\n");
+						
+						Gdx.app.log("GoBoard", "Updating board");
+						Gdx.app.log("GoBoard", "Sending command: list_stones black");
+						pInput.write("list_stones black\n");
 						pInput.flush();
-						if (getNext().equals("= "))
-						{
-							Gdx.app.log("GoBoard", "Updating board");
-							game.updateBoard(messages);
-						}
+						Gdx.app.log("GoBoard", "Sending command: list_stones white");
+						pInput.write("list_stones white\n");
+						pInput.flush();					
+						game.updateBoard(getNext(),getNext());
+
 					}
 
 
@@ -195,7 +224,7 @@ public class GoBoard implements InputProcessor{
 	
 	private String getNext() throws InterruptedException
 	{
-		String got = messages.poll(2, TimeUnit.SECONDS);
+		String got = messages.poll(10, TimeUnit.SECONDS);
 		while (got.equals("\n") || got.equals(""))
 		{
 			got = messages.poll(2, TimeUnit.SECONDS);

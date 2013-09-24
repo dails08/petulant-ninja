@@ -25,8 +25,11 @@ public class ReaderThread extends Thread {
 	        try {
 	            while (true)
 	            {
-	            	if ((line = reader.readLine()) != null) 
+	            	if ((line = reader.readLine()) != null)
+	            	{
+	            		Gdx.app.log("ReaderThread", line);
 	            		mezzanine.offer(line);
+	            	}
 	            }
 	        }
 	        catch(IOException exception) {

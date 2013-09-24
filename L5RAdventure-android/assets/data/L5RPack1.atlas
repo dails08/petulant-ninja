@@ -1,0 +1,12 @@
+
+L5RPack1.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+L5RPack1
+  rotate: false
+  xy: 1, 1
+  size: 2048, 2048
+  orig: 2048, 2048
+  offset: 0, 0
+  index: -1
