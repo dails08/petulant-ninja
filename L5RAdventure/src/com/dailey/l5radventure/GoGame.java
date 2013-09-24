@@ -53,21 +53,33 @@ public class GoGame {
 	{
 		int[] answer = new int[2];
 		
-		answer[0] = s.charAt(0)-65;
+		String master = "ABCDEFGHJKLMNOPQRST";
+		/*
+		if (s.charAt(0)>='I')
+			answer[0] = s.charAt(0)-66;
+		else
+			answer[0] = s.charAt(0)-65;
+		*/
+		answer[0] = master.indexOf(s.charAt(0));
 		answer[1] = Integer.valueOf(s.substring(1))-1;
 		return answer;			
 	}
 	
 	private String translateFromPair(int i, int j)
 	{
+		
 		char c = (char)(i+65);
 		String p = String.valueOf(j);
+		if (j>=9)
+			p = String.valueOf(j+1);
 		return c+p;
 		
 	}
 	
 	public void updateBoard(String blackString, String whiteString)
 	{
+		Gdx.app.log("GoGame", "Clearing board");
+		clearBoard();
 		Gdx.app.log("GoGame", "Setting black stones...");
 		String[] blackstones = blackString.split(" ");
 		Gdx.app.log("GoGame", blackstones.length+" black stones:");

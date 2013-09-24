@@ -177,7 +177,9 @@ public class GoBoard implements InputProcessor{
 			Gdx.app.log("GoBoard", "blackstone.x = "+blackstone.getX());
 			int tempX = (int)Math.round(blackstone.getX()/divisionWidth);
 			Gdx.app.log("GoBoard", "tempX = "+tempX);
-			char transX = (char) (tempX+65);
+			//char transX = (char) (tempX+65);
+			String master = "ABCDEFGHJKLMNOPQRST";
+			char transX = master.charAt(tempX);
 			Gdx.app.log("GoBoard", "transX = "+transX);
 			Gdx.app.log("GoBoard", "blackstone.y = "+blackstone.getY());
 			int tempY = (int)(Math.round((blackstone.getY()/divisionHeight)) + 1);
@@ -224,10 +226,13 @@ public class GoBoard implements InputProcessor{
 	
 	private String getNext() throws InterruptedException
 	{
-		String got = messages.poll(10, TimeUnit.SECONDS);
+		//String got = messages.poll(5, TimeUnit.MINUTES);
+		String got = null; //you shouldn't have to do this, that's the whole point of a blocking queue, but take() isn't waiting before returning null, so here we are.
+		while (got == null)
+			got = messages.take();
 		while (got.equals("\n") || got.equals(""))
 		{
-			got = messages.poll(2, TimeUnit.SECONDS);
+			got = messages.take();
 		}
 		Gdx.app.log("GetNext", "Returning \""+got+"\"");
 		return got;
