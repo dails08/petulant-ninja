@@ -60,6 +60,7 @@ public class GoScreen implements Screen{
 		batch = new SpriteBatch();
 		goAtlas = new TextureAtlas("data/L5RPack1.pack");
 		
+		
 		Gdx.app.log("GoScreen", System.getProperty("os.name").toLowerCase());
 		
 		//processError = new BufferedReader(new InputStreamReader(gnugo.getErrorStream()));
