@@ -18,6 +18,7 @@ public class GoBoard implements InputProcessor{
 	OutputStreamWriter pInput;
 	ArrayBlockingQueue<String> messages;
 	float x,y, width, height, scale, pX, pY;
+	GoScreen screen;
 	
 
 	public void draw(SpriteBatch batch)
@@ -63,7 +64,7 @@ public class GoBoard implements InputProcessor{
 		
 	}
 	
-	public GoBoard(TextureAtlas goAtlas, OutputStreamWriter pInput, ArrayBlockingQueue<String> messages)
+	public GoBoard(TextureAtlas goAtlas, OutputStreamWriter pInput, ArrayBlockingQueue<String> messages, GoScreen screen)
 	{
 		x=0;
 		y=0;
@@ -76,6 +77,7 @@ public class GoBoard implements InputProcessor{
 		goban.setSize(getWidth(),getHeight());
 		this.pInput = pInput;
 		this.messages = messages;
+		this.screen = screen;
 		blackstone = goAtlas.createSprite("blackstone");
 		blackstone.setSize(stoneSize(), stoneSize());
 		blackstone.setOrigin(blackstone.getWidth()/2, blackstone.getHeight()/2);
@@ -211,7 +213,7 @@ public class GoBoard implements InputProcessor{
 
 
 				}
-				
+				screen.updateScore();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -220,7 +222,6 @@ public class GoBoard implements InputProcessor{
 				e.printStackTrace();
 			}
 		}
-		
 		return false;
 	}
 	

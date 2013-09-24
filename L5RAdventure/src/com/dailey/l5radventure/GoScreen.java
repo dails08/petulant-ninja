@@ -4,20 +4,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL11;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 
-public class GoScreen implements Screen{
+public class GoScreen implements Screen, InputProcessor{
 	
-	TextureAtlas goAtlas;
+	TextureAtlas goAtlas, UIObjects;
+	BitmapFont font;
 	SpriteBatch batch;
 	GoBoard board;
 	Process gnugo=null;		//gnugo ai, must support GTP
@@ -26,6 +28,8 @@ public class GoScreen implements Screen{
 	OutputStreamWriter processInput;
 	ReaderThread reader;
 	ArrayBlockingQueue<String> messages;
+	String scoreSummary;
+	double score;
 
 	
 	@Override
@@ -41,6 +45,9 @@ public class GoScreen implements Screen{
 		batch.begin();
 		
 		board.draw(batch);
+		font.setColor(Color.WHITE);
+		font.draw(batch, scoreSummary, 0, Gdx.graphics.getHeight()-30);
+
 		
 		batch.end();
 		//Gdx.app.log(L5RGame.LOG, "...rendered.");
@@ -59,6 +66,8 @@ public class GoScreen implements Screen{
 		Gdx.app.log(L5RGame.LOG, "Showing...");
 		batch = new SpriteBatch();
 		goAtlas = new TextureAtlas("data/L5RPack1.pack");
+		UIObjects = new TextureAtlas("data/UIObjects.pack");
+		font = new BitmapFont(Gdx.files.internal("data/ubuntu.fnt"), UIObjects.findRegion("ubuntu"), false);
 		
 		
 		Gdx.app.log("GoScreen", System.getProperty("os.name").toLowerCase());
@@ -67,7 +76,7 @@ public class GoScreen implements Screen{
 		
 		
 		try {
-			gnugo = Runtime.getRuntime().exec("gnugo --mode gtp");
+			gnugo = Runtime.getRuntime().exec("gnugo --mode gtp --level 1");
 		} catch (IOException e) {
 			Gdx.app.log("GoScreen", "Problem starting gnugo!");
 			e.printStackTrace();
@@ -80,7 +89,7 @@ public class GoScreen implements Screen{
 
 		messages = new ArrayBlockingQueue<String>(30);
 		
-		board = new GoBoard(goAtlas, processInput, messages);
+		board = new GoBoard(goAtlas, processInput, messages, this);
 	
 		Gdx.input.setInputProcessor(board);
 
@@ -88,10 +97,30 @@ public class GoScreen implements Screen{
 		reader = new ReaderThread(processOutput, messages);
 		reader.start();
 		
+		scoreSummary = "Even game";
+		
 
 	
 		
 		Gdx.app.log(L5RGame.LOG, "...shown.");
+	}
+	
+	public void updateScore() throws IOException, InterruptedException
+	{
+		processInput.write("estimate_score\n");
+		processInput.flush();
+		String scoreRaw = messages.take();
+		
+		String[] scoreSplit = scoreRaw.split(" ");
+		if (scoreSplit[0].equals("="))
+		{
+			String ahead = "Black";
+			if (scoreSplit[1].charAt(0)=='W')
+				ahead = "White";
+			scoreSummary = ahead + " winning by " + scoreSplit[1].substring(2);			
+			
+		}
+		
 	}
 
 	@Override
@@ -113,9 +142,60 @@ public class GoScreen implements Screen{
 	}
 
 	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
+	public void dispose() 
+	{
+		goAtlas.dispose();
+		batch.dispose();
+		font.dispose();
 		
+	}
+
+	@Override
+	public boolean keyDown(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

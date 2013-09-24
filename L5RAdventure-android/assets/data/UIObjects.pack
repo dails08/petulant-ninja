@@ -1,0 +1,26 @@
+
+UIObjects.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: y
+ubuntu
+  rotate: false
+  xy: 1, 103
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+blueButton9
+  rotate: false
+  xy: 1, 1
+  size: 34, 100
+  orig: 34, 100
+  offset: 0, 0
+  index: -1
+redButton9
+  rotate: false
+  xy: 515, 515
+  size: 34, 100
+  orig: 34, 100
+  offset: 0, 0
+  index: -1
