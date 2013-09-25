@@ -105,12 +105,8 @@ public class GoScreen implements Screen, InputProcessor{
 		Gdx.app.log(L5RGame.LOG, "...shown.");
 	}
 	
-	public void updateScore() throws IOException, InterruptedException
+	public void updateScore(String scoreRaw)
 	{
-		processInput.write("estimate_score\n");
-		processInput.flush();
-		String scoreRaw = messages.take();
-		
 		String[] scoreSplit = scoreRaw.split(" ");
 		if (scoreSplit[0].equals("="))
 		{
