@@ -174,7 +174,7 @@ public class GoBoard implements InputProcessor{
 		Gdx.app.log("GoBoard", "divisionWidth = "+divisionWidth);
 		Gdx.app.log("GoBoard", "divisionHeight = "+divisionHeight);
 		
-		if (game.blacksTurn)
+		if (game.blacksTurn && !game.whiteResign)
 		{
 			Gdx.app.log("GoBoard", "blackstone.x = "+blackstone.getX());
 			int tempX = (int)Math.round(blackstone.getX()/divisionWidth);
@@ -199,21 +199,28 @@ public class GoBoard implements InputProcessor{
 					pInput.flush();
 					if (getNext().contains("="))
 					{
-						
-						Gdx.app.log("GoBoard", "Updating board");
-						Gdx.app.log("GoBoard", "Sending command: list_stones black");
-						pInput.write("list_stones black\n");
-						pInput.flush();
-						Gdx.app.log("GoBoard", "Sending command: list_stones white");
-						pInput.write("list_stones white\n");
-						pInput.flush();					
-						game.updateBoard(getNext(),getNext());
+						if (getNext().equalsIgnoreCase("resign"))
+							game.whiteResign = true;
+						else
+						{
+							Gdx.app.log("GoBoard", "Updating board");
+							Gdx.app.log("GoBoard", "Sending command: list_stones black");
+							pInput.write("list_stones black\n");
+							pInput.flush();
+							Gdx.app.log("GoBoard", "Sending command: list_stones white");
+							pInput.write("list_stones white\n");
+							pInput.flush();					
+							game.updateBoard(getNext(),getNext());
+						}
 
 					}
 
 
 				}
-				screen.updateScore();
+				pInput.write("estimate_score\n");
+				pInput.flush();
+				
+				screen.updateScore(getNext());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
