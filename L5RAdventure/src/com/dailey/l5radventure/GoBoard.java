@@ -197,10 +197,16 @@ public class GoBoard implements InputProcessor{
 					Gdx.app.log("GoBoard", "Sending to goEngine: genmove white");
 					pInput.write("genmove white\n");
 					pInput.flush();
-					if (getNext().contains("="))
+					Gdx.app.log("GoBoard", "getNexting");
+					String next = getNext();
+					Gdx.app.log("GoBoard", "getNext() complete.");
+					if (next.contains("="))
 					{
-						if (getNext().equalsIgnoreCase("resign"))
+						Gdx.app.log("GoBoard", "next contains =");
+						if (next.contains("resign"))
+						{
 							game.whiteResign = true;
+						}
 						else
 						{
 							Gdx.app.log("GoBoard", "Updating board");
@@ -213,6 +219,10 @@ public class GoBoard implements InputProcessor{
 							game.updateBoard(getNext(),getNext());
 						}
 
+					}
+					else
+					{
+						Gdx.app.log("GoBoard", "getNext() doesn't contain =");
 					}
 
 
