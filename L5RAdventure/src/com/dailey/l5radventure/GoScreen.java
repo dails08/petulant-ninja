@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 
 
 public class GoScreen implements Screen, InputProcessor{
@@ -30,6 +31,8 @@ public class GoScreen implements Screen, InputProcessor{
 	ArrayBlockingQueue<String> messages;
 	String scoreSummary;
 	double score;
+	
+	Stage ui;
 
 	
 	@Override
@@ -90,6 +93,8 @@ public class GoScreen implements Screen, InputProcessor{
 		messages = new ArrayBlockingQueue<String>(30);
 		
 		board = new GoBoard(goAtlas, processInput, messages, this);
+		board.setX(70);
+		board.setY(70);
 	
 		Gdx.input.setInputProcessor(board);
 
@@ -98,6 +103,10 @@ public class GoScreen implements Screen, InputProcessor{
 		reader.start();
 		
 		scoreSummary = "Even game";
+		
+		ui = new Stage();
+		
+		
 		
 
 	

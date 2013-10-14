@@ -3,7 +3,6 @@ package com.dailey.l5radventure;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -23,6 +22,8 @@ public class GoBoard implements InputProcessor{
 
 	public void draw(SpriteBatch batch)
 	{
+		goban.setPosition(x, y);
+		goban.setSize(width, height);
 		goban.draw(batch);
 		float divisionWidth = getWidth()/19f;
 		float divisionHeight = getHeight()/19f;
@@ -32,12 +33,12 @@ public class GoBoard implements InputProcessor{
 			{
 				if (game.getCoord(i, j)==1)
 				{
-					blackstone.setPosition(i*divisionHeight, j*divisionWidth);
+					blackstone.setPosition((i+1)*divisionHeight, (j+1)*divisionWidth);
 					blackstone.draw(batch);
 				}
 				else if (game.getCoord(i, j)==2)
 				{
-					whitestone.setPosition(i*divisionHeight, j*divisionWidth);
+					whitestone.setPosition((i+1)*divisionHeight, (j+1)*divisionWidth);
 					whitestone.draw(batch);
 				}
 				else
@@ -75,6 +76,7 @@ public class GoBoard implements InputProcessor{
 		scale = 1.0f;
 		goban = goAtlas.createSprite("goban");
 		goban.setSize(getWidth(),getHeight());
+		goban.setPosition(x, y);
 		this.pInput = pInput;
 		this.messages = messages;
 		this.screen = screen;
@@ -179,12 +181,11 @@ public class GoBoard implements InputProcessor{
 			Gdx.app.log("GoBoard", "blackstone.x = "+blackstone.getX());
 			int tempX = (int)Math.round(blackstone.getX()/divisionWidth);
 			Gdx.app.log("GoBoard", "tempX = "+tempX);
-			//char transX = (char) (tempX+65);
 			String master = "ABCDEFGHJKLMNOPQRST";
-			char transX = master.charAt(tempX);
+			char transX = master.charAt(tempX-1);
 			Gdx.app.log("GoBoard", "transX = "+transX);
 			Gdx.app.log("GoBoard", "blackstone.y = "+blackstone.getY());
-			int tempY = (int)(Math.round((blackstone.getY()/divisionHeight)) + 1);
+			int tempY = (int)(Math.round((blackstone.getY()/divisionHeight)));
 			Gdx.app.log("GoBoard", "tempY = "+tempY);
 			try {
 				String command = "play black "+transX+""+tempY+"\n";
