@@ -1,9 +1,11 @@
 package com.dailey.l5radventure;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.badlogic.gdx.Gdx;
@@ -49,9 +51,16 @@ public class GoScreen implements Screen, InputProcessor{
 		
 		board.draw(batch);
 		font.setColor(Color.WHITE);
-		font.draw(batch, scoreSummary, 0, Gdx.graphics.getHeight()-30);
+		if (board.getGame().whiteResign)
+		{
+			font.draw(batch, "White resigns.", 0, Gdx.graphics.getHeight()-30);
+		}
+		else
+			font.draw(batch, scoreSummary, 0, Gdx.graphics.getHeight()-30);
 
 		
+		//font.draw(batch, board.getrX()+", "+board.getrY(), board.getpX(), board.getpY());
+		font.draw(batch, board.getProsMove(), board.getpX(), board.getpY());
 		batch.end();
 		//Gdx.app.log(L5RGame.LOG, "...rendered.");
 		
@@ -73,15 +82,29 @@ public class GoScreen implements Screen, InputProcessor{
 		font = new BitmapFont(Gdx.files.internal("data/ubuntu.fnt"), UIObjects.findRegion("ubuntu"), false);
 		
 		
-		Gdx.app.log("GoScreen", System.getProperty("os.name").toLowerCase());
+		String os = System.getProperty("os.name").toLowerCase();
+		Gdx.app.log("GoScreen", os);
 		
 		//processError = new BufferedReader(new InputStreamReader(gnugo.getErrorStream()));
 		
+		String pwd = System.getProperty("user.dir");
 		
 		try {
-			gnugo = Runtime.getRuntime().exec("gnugo --mode gtp --level 1");
+			if (os.equals("linux") || os.equals("unix"))
+			{
+				String loc = pwd+"/data/ai/gnugo";
+				Runtime.getRuntime().exec("chmod +x "+loc);
+				gnugo = Runtime.getRuntime().exec("gnugo --mode gtp --level 1");
+				//gnugo = Runtime.getRuntime().exec(loc+" --mode gtp --level 1");
+			}
+			else
+			{
+				String loc = pwd+"/data/ai/gnugo.exe";
+				gnugo = Runtime.getRuntime().exec(loc+" --mode gtp --level 1");
+			}
 		} catch (IOException e) {
 			Gdx.app.log("GoScreen", "Problem starting gnugo!");
+			System.out.println("Problem starting gnugo!");
 			e.printStackTrace();
 		}
 		
@@ -93,8 +116,8 @@ public class GoScreen implements Screen, InputProcessor{
 		messages = new ArrayBlockingQueue<String>(30);
 		
 		board = new GoBoard(goAtlas, processInput, messages, this);
-		board.setX(70);
-		board.setY(70);
+		board.setX(0);
+		board.setY(0);
 	
 		Gdx.input.setInputProcessor(board);
 

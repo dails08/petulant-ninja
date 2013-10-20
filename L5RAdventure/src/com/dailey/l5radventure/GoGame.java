@@ -55,12 +55,7 @@ public class GoGame {
 		int[] answer = new int[2];
 		
 		String master = "ABCDEFGHJKLMNOPQRST";
-		/*
-		if (s.charAt(0)>='I')
-			answer[0] = s.charAt(0)-66;
-		else
-			answer[0] = s.charAt(0)-65;
-		*/
+
 		answer[0] = master.indexOf(s.charAt(0));
 		answer[1] = Integer.valueOf(s.substring(1))-1;
 		return answer;			

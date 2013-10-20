@@ -16,8 +16,9 @@ public class GoBoard implements InputProcessor{
 	Sprite goban, whitestone, blackstone;
 	OutputStreamWriter pInput;
 	ArrayBlockingQueue<String> messages;
-	float x,y, width, height, scale, pX, pY;
+	float x,y, width, height, scale, pX, pY, rX, rY;
 	GoScreen screen;
+	String prosMove;
 	
 
 	public void draw(SpriteBatch batch)
@@ -33,12 +34,12 @@ public class GoBoard implements InputProcessor{
 			{
 				if (game.getCoord(i, j)==1)
 				{
-					blackstone.setPosition((i+1)*divisionHeight, (j+1)*divisionWidth);
+					blackstone.setPosition((i)*divisionHeight+getX(), (j)*divisionWidth+getY());
 					blackstone.draw(batch);
 				}
 				else if (game.getCoord(i, j)==2)
 				{
-					whitestone.setPosition((i+1)*divisionHeight, (j+1)*divisionWidth);
+					whitestone.setPosition((i)*divisionHeight+getX(), (j)*divisionWidth+getY());
 					whitestone.draw(batch);
 				}
 				else
@@ -46,12 +47,12 @@ public class GoBoard implements InputProcessor{
 					
 			}
 		}
-		if (goban.getBoundingRectangle().contains(pX, pY))
+		if (goban.getBoundingRectangle().contains(pX, pY) && !game.whiteResign)
 		{
 				
 			if (game.blacksTurn)
 			{
-				blackstone.setPosition((float)(Math.floor(pX/divisionWidth)*divisionWidth), (float)(Math.floor(pY/divisionHeight)*divisionHeight));
+				blackstone.setPosition((float)(Math.floor(getrX()/divisionWidth)*divisionWidth+getX()), (float)(Math.floor(getrY()/divisionHeight)*divisionHeight+getY()));
 				blackstone.draw(batch);
 			}
 			else
@@ -71,6 +72,9 @@ public class GoBoard implements InputProcessor{
 		y=0;
 		pX=-1;
 		pY=-1;
+		rX = 1;
+		rY = -1;
+		prosMove = "";
 		width = 700;
 		height = 700;
 		scale = 1.0f;
@@ -92,6 +96,14 @@ public class GoBoard implements InputProcessor{
 	
 	
 	
+	public String getProsMove() {
+		return prosMove;
+	}
+
+	public void setProsMove(String prosMove) {
+		this.prosMove = prosMove;
+	}
+
 	private int[] translateMouseToCoords()
 	{
 		int[] coords = new int[2];
@@ -169,8 +181,12 @@ public class GoBoard implements InputProcessor{
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) 
 	{
+		if (!(pX>=getX() && pX<=getX()+getWidth()) || !(pY>=getY() && pY<=getY()+getHeight()))
+			return false;
 		Gdx.app.log("GoBoard", "Width = "+getWidth());
 		Gdx.app.log("GoBoard", "Height = "+getHeight());
+		Gdx.app.log("GoBoard", "X = "+getX());
+		Gdx.app.log("GoBoard", "Y = "+getY());
 		float divisionWidth = getWidth()/19f;
 		float divisionHeight = getHeight()/19f;
 		Gdx.app.log("GoBoard", "divisionWidth = "+divisionWidth);
@@ -178,14 +194,30 @@ public class GoBoard implements InputProcessor{
 		
 		if (game.blacksTurn && !game.whiteResign)
 		{
-			Gdx.app.log("GoBoard", "blackstone.x = "+blackstone.getX());
-			int tempX = (int)Math.round(blackstone.getX()/divisionWidth);
+			
+			
+			
+			//float bsSpotX = blackstone.getX()+blackstone.getWidth()/2;
+			//Gdx.app.log("GoBoard", "blackstone spotx = "+bsSpotX);
+			//Gdx.app.log("GoBoard", "Accounting for posit: "+(bsSpotX-getX()));
+			//int tempX = (int)Math.round((bsSpotX-getX())/divisionWidth);
+			
+			int tempX = (int)Math.round((getrX()+divisionWidth/2)/divisionWidth);
+			
 			Gdx.app.log("GoBoard", "tempX = "+tempX);
 			String master = "ABCDEFGHJKLMNOPQRST";
 			char transX = master.charAt(tempX-1);
 			Gdx.app.log("GoBoard", "transX = "+transX);
-			Gdx.app.log("GoBoard", "blackstone.y = "+blackstone.getY());
-			int tempY = (int)(Math.round((blackstone.getY()/divisionHeight)));
+			
+			//float bsSpotY = blackstone.getY()+blackstone.getHeight()/2;
+			//Gdx.app.log("GoBoard", "blackstone spoty = "+bsSpotY);
+			//Gdx.app.log("GoBoard", "Accounting for posit: "+(bsSpotY-getY()));
+			//int tempY = (int)Math.round((bsSpotY-getY())/divisionHeight);
+			
+			int tempY = (int)Math.round((getrY()+divisionHeight/2)/divisionHeight);
+			
+			
+			
 			Gdx.app.log("GoBoard", "tempY = "+tempY);
 			try {
 				String command = "play black "+transX+""+tempY+"\n";
@@ -274,7 +306,109 @@ public class GoBoard implements InputProcessor{
 	{
 		pX=screenX;
 		pY=Gdx.graphics.getHeight()-screenY;
+		rX = pX - getX();
+		rY = pY - getY();
+		float divisionWidth = getWidth()/19f;
+		float divisionHeight = getHeight()/19f;
+
+		
+		
+		
+		
+		int tempX = (int)Math.round((getrX()+divisionWidth/2)/divisionWidth);
+		String master = "ABCDEFGHJKLMNOPQRST";
+		if (tempX>19)
+			tempX=19;
+		else if (tempX<1)
+			tempX = 1;
+		char transX = master.charAt(tempX-1);
+
+		int tempY = (int)Math.round((getrY()+divisionHeight/2)/divisionHeight);
+
+		
+		prosMove = transX+""+tempY;
+		
 		return false;
+	}
+
+	public Sprite getGoban() {
+		return goban;
+	}
+
+	public void setGoban(Sprite goban) {
+		this.goban = goban;
+	}
+
+	public Sprite getWhitestone() {
+		return whitestone;
+	}
+
+	public void setWhitestone(Sprite whitestone) {
+		this.whitestone = whitestone;
+	}
+
+	public Sprite getBlackstone() {
+		return blackstone;
+	}
+
+	public void setBlackstone(Sprite blackstone) {
+		this.blackstone = blackstone;
+	}
+
+	public OutputStreamWriter getpInput() {
+		return pInput;
+	}
+
+	public void setpInput(OutputStreamWriter pInput) {
+		this.pInput = pInput;
+	}
+
+	public ArrayBlockingQueue<String> getMessages() {
+		return messages;
+	}
+
+	public void setMessages(ArrayBlockingQueue<String> messages) {
+		this.messages = messages;
+	}
+
+	public float getpX() {
+		return pX;
+	}
+
+	public void setpX(float pX) {
+		this.pX = pX;
+	}
+
+	public float getpY() {
+		return pY;
+	}
+
+	public void setpY(float pY) {
+		this.pY = pY;
+	}
+
+	public float getrX() {
+		return rX;
+	}
+
+	public void setrX(float rX) {
+		this.rX = rX;
+	}
+
+	public float getrY() {
+		return rY;
+	}
+
+	public void setrY(float rY) {
+		this.rY = rY;
+	}
+
+	public GoScreen getScreen() {
+		return screen;
+	}
+
+	public void setScreen(GoScreen screen) {
+		this.screen = screen;
 	}
 
 	@Override
