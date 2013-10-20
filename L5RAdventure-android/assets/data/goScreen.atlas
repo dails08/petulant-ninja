@@ -1,0 +1,132 @@
+
+goScreen.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+goban
+  rotate: false
+  xy: 1, 47
+  size: 2000, 2000
+  orig: 2000, 2000
+  offset: 0, 0
+  index: -1
+whitestone
+  rotate: false
+  xy: 1, 1
+  size: 44, 44
+  orig: 44, 44
+  offset: 0, 0
+  index: -1
+blackstone
+  rotate: false
+  xy: 2003, 2003
+  size: 44, 44
+  orig: 44, 44
+  offset: 0, 0
+  index: -1
+silver
+  rotate: false
+  xy: 2003, 1927
+  size: 38, 74
+  orig: 38, 74
+  offset: 0, 0
+  index: -1
+orangeh
+  rotate: false
+  xy: 2003, 1851
+  size: 38, 74
+  orig: 38, 74
+  offset: 0, 0
+  index: -1
+btn_default_normal_brown
+  rotate: false
+  xy: 2003, 1777
+  size: 36, 72
+  split: 18, 17, 34, 37
+  orig: 36, 72
+  offset: 0, 0
+  index: -1
+green
+  rotate: false
+  xy: 2003, 1703
+  size: 36, 72
+  split: 18, 17, 34, 37
+  orig: 36, 72
+  offset: 0, 0
+  index: -1
+btn_default_normal_yellow
+  rotate: false
+  xy: 2003, 1629
+  size: 36, 72
+  split: 18, 17, 34, 37
+  orig: 36, 72
+  offset: 0, 0
+  index: -1
+btn_default_pressed
+  rotate: false
+  xy: 2003, 1555
+  size: 36, 72
+  split: 18, 17, 34, 37
+  orig: 36, 72
+  offset: 0, 0
+  index: -1
+orange
+  rotate: false
+  xy: 2003, 1481
+  size: 36, 72
+  split: 18, 17, 34, 37
+  orig: 36, 72
+  offset: 0, 0
+  index: -1
+btn_default_normal_pink
+  rotate: false
+  xy: 2003, 1407
+  size: 36, 72
+  split: 18, 17, 34, 37
+  orig: 36, 72
+  offset: 0, 0
+  index: -1
+btn_default_normal_disable
+  rotate: false
+  xy: 2003, 1333
+  size: 36, 72
+  split: 18, 17, 34, 37
+  orig: 36, 72
+  offset: 0, 0
+  index: -1
+btn_default_normal_lblue
+  rotate: false
+  xy: 2003, 1259
+  size: 36, 72
+  split: 18, 17, 34, 37
+  orig: 36, 72
+  offset: 0, 0
+  index: -1
+blue
+  rotate: false
+  xy: 2003, 1185
+  size: 36, 72
+  split: 18, 17, 34, 37
+  orig: 36, 72
+  offset: 0, 0
+  index: -1
+btn_default_normal_red
+  rotate: false
+  xy: 2003, 1111
+  size: 36, 72
+  split: 18, 17, 34, 37
+  orig: 36, 72
+  offset: 0, 0
+  index: -1
+
+goScreen2.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+ubuntu
+  rotate: false
+  xy: 1, 1
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1

@@ -1,27 +1,36 @@
 package com.dailey.l5radventure;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 
 public class GoScreen implements Screen, InputProcessor{
 	
-	TextureAtlas goAtlas, UIObjects;
+	TextureAtlas goAtlas;
+	TextureRegion buttonUp, buttonDown;
+	NinePatch buttonUp9, buttonDown9;
 	BitmapFont font;
 	SpriteBatch batch;
 	GoBoard board;
@@ -32,6 +41,7 @@ public class GoScreen implements Screen, InputProcessor{
 	ReaderThread reader;
 	ArrayBlockingQueue<String> messages;
 	String scoreSummary;
+	Skin skin;
 	double score;
 	
 	Stage ui;
@@ -45,8 +55,6 @@ public class GoScreen implements Screen, InputProcessor{
 		
 	
 
-
-
 		batch.begin();
 		
 		board.draw(batch);
@@ -58,10 +66,16 @@ public class GoScreen implements Screen, InputProcessor{
 		else
 			font.draw(batch, scoreSummary, 0, Gdx.graphics.getHeight()-30);
 
-		
+		font.draw(batch, "Free Moves: "+board.getFreeMoves(), Gdx.graphics.getWidth()-300, Gdx.graphics.getHeight()-30);	
 		//font.draw(batch, board.getrX()+", "+board.getrY(), board.getpX(), board.getpY());
 		font.draw(batch, board.getProsMove(), board.getpX(), board.getpY());
+		
 		batch.end();
+
+		
+		ui.draw();
+		Table.drawDebug(ui);
+		
 		//Gdx.app.log(L5RGame.LOG, "...rendered.");
 		
 	}
@@ -77,10 +91,68 @@ public class GoScreen implements Screen, InputProcessor{
 
 		Gdx.app.log(L5RGame.LOG, "Showing...");
 		batch = new SpriteBatch();
-		goAtlas = new TextureAtlas("data/L5RPack1.pack");
-		UIObjects = new TextureAtlas("data/UIObjects.pack");
-		font = new BitmapFont(Gdx.files.internal("data/ubuntu.fnt"), UIObjects.findRegion("ubuntu"), false);
+		goAtlas = new TextureAtlas("data/goScreen.atlas");
+		font = new BitmapFont(Gdx.files.internal("data/ubuntu.fnt"), goAtlas.findRegion("ubuntu"), false);
 		
+		ui = new Stage();
+		
+		
+		buttonUp9 = new NinePatch(goAtlas.findRegion("blue"));
+		buttonDown9 = new NinePatch(goAtlas.findRegion("green"));
+		
+		skin = new Skin();
+		skin.add("blue", goAtlas.findRegion("blue"), TextureRegion.class);
+		skin.add("green", goAtlas.findRegion("green"), TextureRegion.class);
+		
+		Table table = new Table();
+		table.setFillParent(true);
+		table.right();
+
+		
+		TextButtonStyle style = new TextButtonStyle(skin.getDrawable("blue"), skin.getDrawable("green"), skin.getDrawable("blue"));
+		style.font = font;
+		
+		
+		TextButton pass = new TextButton("Pass", style);
+		table.add(pass);
+
+		
+		table.row();
+		
+		TextButton freeMove = new TextButton("Free Move",style);
+		freeMove.addListener(new ChangeListener(){
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) 
+			{
+				board.setFreeMoves(board.getFreeMoves()+1);
+				
+			}
+			
+		});
+		table.add(freeMove);
+		
+		table.row();
+		
+		TextButton quit = new TextButton("Quit", style);
+		quit.addListener(new ChangeListener(){
+			
+			public void changed(ChangeEvent event, Actor actor)
+			{
+				Gdx.app.exit();
+			}
+		});
+		
+		
+		table.add(quit);
+		
+		
+		
+		
+		
+		
+		
+		ui.addActor(table);
 		
 		String os = System.getProperty("os.name").toLowerCase();
 		Gdx.app.log("GoScreen", os);
@@ -94,8 +166,8 @@ public class GoScreen implements Screen, InputProcessor{
 			{
 				String loc = pwd+"/data/ai/gnugo";
 				Runtime.getRuntime().exec("chmod +x "+loc);
-				gnugo = Runtime.getRuntime().exec("gnugo --mode gtp --level 1");
-				//gnugo = Runtime.getRuntime().exec(loc+" --mode gtp --level 1");
+				//gnugo = Runtime.getRuntime().exec("gnugo --mode gtp --level 1");
+				gnugo = Runtime.getRuntime().exec(loc+" --mode gtp --level 1");
 			}
 			else
 			{
@@ -119,15 +191,18 @@ public class GoScreen implements Screen, InputProcessor{
 		board.setX(0);
 		board.setY(0);
 	
-		Gdx.input.setInputProcessor(board);
+		InputMultiplexer mux = new InputMultiplexer();
+		mux.addProcessor(ui);
+		mux.addProcessor(board);
 
+		Gdx.input.setInputProcessor(mux);
 	
 		reader = new ReaderThread(processOutput, messages);
 		reader.start();
 		
 		scoreSummary = "Even game";
 		
-		ui = new Stage();
+		
 		
 		
 		

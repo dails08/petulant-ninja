@@ -19,6 +19,7 @@ public class GoBoard implements InputProcessor{
 	float x,y, width, height, scale, pX, pY, rX, rY;
 	GoScreen screen;
 	String prosMove;
+	int freeMoves;
 	
 
 	public void draw(SpriteBatch batch)
@@ -78,6 +79,7 @@ public class GoBoard implements InputProcessor{
 		width = 700;
 		height = 700;
 		scale = 1.0f;
+		freeMoves = 0;
 		goban = goAtlas.createSprite("goban");
 		goban.setSize(getWidth(),getHeight());
 		goban.setPosition(x, y);
@@ -96,6 +98,14 @@ public class GoBoard implements InputProcessor{
 	
 	
 	
+	public int getFreeMoves() {
+		return freeMoves;
+	}
+
+	public void setFreeMoves(int freeMoves) {
+		this.freeMoves = freeMoves;
+	}
+
 	public String getProsMove() {
 		return prosMove;
 	}
@@ -195,13 +205,6 @@ public class GoBoard implements InputProcessor{
 		if (game.blacksTurn && !game.whiteResign)
 		{
 			
-			
-			
-			//float bsSpotX = blackstone.getX()+blackstone.getWidth()/2;
-			//Gdx.app.log("GoBoard", "blackstone spotx = "+bsSpotX);
-			//Gdx.app.log("GoBoard", "Accounting for posit: "+(bsSpotX-getX()));
-			//int tempX = (int)Math.round((bsSpotX-getX())/divisionWidth);
-			
 			int tempX = (int)Math.round((getrX()+divisionWidth/2)/divisionWidth);
 			
 			Gdx.app.log("GoBoard", "tempX = "+tempX);
@@ -209,15 +212,10 @@ public class GoBoard implements InputProcessor{
 			char transX = master.charAt(tempX-1);
 			Gdx.app.log("GoBoard", "transX = "+transX);
 			
-			//float bsSpotY = blackstone.getY()+blackstone.getHeight()/2;
-			//Gdx.app.log("GoBoard", "blackstone spoty = "+bsSpotY);
-			//Gdx.app.log("GoBoard", "Accounting for posit: "+(bsSpotY-getY()));
-			//int tempY = (int)Math.round((bsSpotY-getY())/divisionHeight);
-			
 			int tempY = (int)Math.round((getrY()+divisionHeight/2)/divisionHeight);
-			
-			
-			
+
+
+
 			Gdx.app.log("GoBoard", "tempY = "+tempY);
 			try {
 				String command = "play black "+transX+""+tempY+"\n";
@@ -227,43 +225,48 @@ public class GoBoard implements InputProcessor{
 				if (getNext().contains("="))
 				{
 					Gdx.app.log("GoBoard", "Command accepted");
-					Gdx.app.log("GoBoard", "Sending to goEngine: genmove white");
-					pInput.write("genmove white\n");
-					pInput.flush();
-					Gdx.app.log("GoBoard", "getNexting");
-					String next = getNext();
-					Gdx.app.log("GoBoard", "getNext() complete.");
-					if (next.contains("="))
+
+					if (getFreeMoves()<=0)
 					{
-						Gdx.app.log("GoBoard", "next contains =");
-						if (next.contains("resign"))
+						Gdx.app.log("GoBoard", "Sending to goEngine: genmove white");
+						pInput.write("genmove white\n");
+						pInput.flush();
+						Gdx.app.log("GoBoard", "getNexting");
+						String next = getNext();
+						Gdx.app.log("GoBoard", "getNext() complete.");
+						if (next.contains("="))
 						{
-							game.whiteResign = true;
+							Gdx.app.log("GoBoard", "next contains =");
+							if (next.contains("resign"))
+							{
+								game.whiteResign = true;
+							}
 						}
 						else
 						{
-							Gdx.app.log("GoBoard", "Updating board");
-							Gdx.app.log("GoBoard", "Sending command: list_stones black");
-							pInput.write("list_stones black\n");
-							pInput.flush();
-							Gdx.app.log("GoBoard", "Sending command: list_stones white");
-							pInput.write("list_stones white\n");
-							pInput.flush();					
-							game.updateBoard(getNext(),getNext());
+							Gdx.app.log("GoBoard", "getNext() doesn't contain =");
 						}
-
 					}
 					else
-					{
-						Gdx.app.log("GoBoard", "getNext() doesn't contain =");
-					}
+						setFreeMoves(getFreeMoves()-1);
 
+					Gdx.app.log("GoBoard", "Updating board");
+					Gdx.app.log("GoBoard", "Sending command: list_stones black");
+					pInput.write("list_stones black\n");
+					pInput.flush();
+					Gdx.app.log("GoBoard", "Sending command: list_stones white");
+					pInput.write("list_stones white\n");
+					pInput.flush();					
+					game.updateBoard(getNext(),getNext());
+					pInput.write("estimate_score\n");
+					pInput.flush();
+					screen.updateScore(getNext());
 
 				}
-				pInput.write("estimate_score\n");
-				pInput.flush();
+				else
+					Gdx.app.log("GoBoard", "Command rejected");
+	
 				
-				screen.updateScore(getNext());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -272,7 +275,7 @@ public class GoBoard implements InputProcessor{
 				e.printStackTrace();
 			}
 		}
-		return false;
+		return true;
 	}
 	
 	private String getNext() throws InterruptedException
