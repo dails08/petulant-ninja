@@ -1,14 +1,17 @@
 package com.dailey.l5radventure;
 
+import java.awt.Label;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class GoBoard implements InputProcessor{
 	
@@ -19,6 +22,7 @@ public class GoBoard implements InputProcessor{
 	float x,y, width, height, scale, pX, pY, rX, rY;
 	GoScreen screen;
 	String prosMove;
+	Sound click;
 	int freeMoves;
 	
 
@@ -93,6 +97,7 @@ public class GoBoard implements InputProcessor{
 		whitestone.setSize(stoneSize(), stoneSize());
 		setX(Gdx.graphics.getWidth()/2-getWidth()/2);
 		setY((Gdx.graphics.getHeight()-getHeight())/2);
+		click = Gdx.audio.newSound(Gdx.files.internal("data/click1.wav"));
 		game = new GoGame();
 	}
 	
@@ -224,6 +229,7 @@ public class GoBoard implements InputProcessor{
 				pInput.flush();
 				if (getNext().contains("="))
 				{
+					click.play();
 					Gdx.app.log("GoBoard", "Command accepted");
 
 					if (getFreeMoves()<=0)
@@ -239,8 +245,17 @@ public class GoBoard implements InputProcessor{
 							Gdx.app.log("GoBoard", "next contains =");
 							if (next.contains("resign"))
 							{
-								game.whiteResign = true;
+								game.setWhiteResign(true);
 							}
+							else if (next.contains("PASS"))
+							{
+								game.setWhitePass(true);
+								Label passLabel = new Label("White passes.");
+								
+								
+							}
+							else
+								game.setWhitePass(false);
 						}
 						else
 						{

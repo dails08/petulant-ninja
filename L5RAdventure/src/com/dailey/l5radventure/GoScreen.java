@@ -72,7 +72,7 @@ public class GoScreen implements Screen, InputProcessor{
 		
 		batch.end();
 
-		
+		ui.act(delta);
 		ui.draw();
 		Table.drawDebug(ui);
 		
@@ -166,8 +166,8 @@ public class GoScreen implements Screen, InputProcessor{
 			{
 				String loc = pwd+"/data/ai/gnugo";
 				Runtime.getRuntime().exec("chmod +x "+loc);
-				//gnugo = Runtime.getRuntime().exec("gnugo --mode gtp --level 1");
-				gnugo = Runtime.getRuntime().exec(loc+" --mode gtp --level 1");
+				gnugo = Runtime.getRuntime().exec("gnugo --mode gtp --level 1");
+				//gnugo = Runtime.getRuntime().exec(loc+" --mode gtp --level 1");
 			}
 			else
 			{
@@ -212,6 +212,14 @@ public class GoScreen implements Screen, InputProcessor{
 		Gdx.app.log(L5RGame.LOG, "...shown.");
 	}
 	
+	public Stage getUi() {
+		return ui;
+	}
+
+	public void setUi(Stage ui) {
+		this.ui = ui;
+	}
+
 	public void updateScore(String scoreRaw)
 	{
 		String[] scoreSplit = scoreRaw.split(" ");

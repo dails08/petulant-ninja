@@ -10,13 +10,15 @@ public class GoGame {
 	
 	int[][] board; //0 = blank 1 = black 2 = white
 	double score;  		//positive if black is ahead, negative if white is ahead
-	boolean blacksTurn, whiteResign;
+	boolean blacksTurn, whiteResign, whitePass, blackPass;
 	
 	public GoGame() 
 	{
 		board = new int[19][19];
 		blacksTurn = true;
 		whiteResign = false;
+		whitePass = false;
+		blackPass = false;
 		
 		//clear the board
 		for (int i=0;i<board.length;i++)
@@ -29,6 +31,54 @@ public class GoGame {
 	
 	}
 	
+	public int[][] getBoard() {
+		return board;
+	}
+
+	public void setBoard(int[][] board) {
+		this.board = board;
+	}
+
+	public double getScore() {
+		return score;
+	}
+
+	public void setScore(double score) {
+		this.score = score;
+	}
+
+	public boolean isBlacksTurn() {
+		return blacksTurn;
+	}
+
+	public void setBlacksTurn(boolean blacksTurn) {
+		this.blacksTurn = blacksTurn;
+	}
+
+	public boolean isWhiteResign() {
+		return whiteResign;
+	}
+
+	public void setWhiteResign(boolean whiteResign) {
+		this.whiteResign = whiteResign;
+	}
+
+	public boolean isWhitePass() {
+		return whitePass;
+	}
+
+	public void setWhitePass(boolean whitePass) {
+		this.whitePass = whitePass;
+	}
+
+	public boolean isBlackPass() {
+		return blackPass;
+	}
+
+	public void setBlackPass(boolean blackPass) {
+		this.blackPass = blackPass;
+	}
+
 	public int getCoord(int i, int j)
 	{
 		return board[i][j];
@@ -154,39 +204,7 @@ public class GoGame {
 		Gdx.app.log("GoGame", "...board updated");
 	}
 	
-	/* update board based on gnugo:showboard
-	public void updateBoard(ArrayBlockingQueue<String> messages) throws InterruptedException
-	{
-		if (messages.poll(2, TimeUnit.SECONDS).contains("A B C D E F G H J K L M N O P Q R S T"))
-		{
-			for (int i = 0; i<19; i++)
-			{
-				String row = messages.poll(2, TimeUnit.SECONDS);
-				Gdx.app.log("GoGame", "Parsing through: "+row);
-				for (int j=4; j<40;j=j+2)
-				{
-					if (row.charAt(j)=='.' || row.charAt(j)=='+')
-					{
-						Gdx.app.log("GoGame", "("+i+","+(j-4)/2+") is empty");
-						board[i][(j-4)/2] = 0;
-					}
-					else if (row.charAt(j)=='X')
-					{
-						Gdx.app.log("GoGame", "("+i+","+(j-4)/2+") is black");
-						board[i][(j-4)/2] = 1;
-					}
-					else
-					{
-						assert row.charAt(j)=='O';
-						Gdx.app.log("GoGame", "("+i+","+(j-4)/2+") is white");
-						board[i][(j-4)/2] = 2;
-					}
-				}
-			}
-			assert messages.poll(2, TimeUnit.SECONDS).contains("A B C D E F G H J K L M N O P Q R S T");
-		}
-	}
-	*/
+	
 	
 
 	
