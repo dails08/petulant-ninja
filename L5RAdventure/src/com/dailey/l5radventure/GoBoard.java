@@ -196,6 +196,8 @@ public class GoBoard implements InputProcessor{
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) 
 	{
+		if (game.isOver())
+			return false;
 		if (!(pX>=getX() && pX<=getX()+getWidth()) || !(pY>=getY() && pY<=getY()+getHeight()))
 			return false;
 		Gdx.app.log("GoBoard", "Width = "+getWidth());
@@ -227,56 +229,15 @@ public class GoBoard implements InputProcessor{
 				Gdx.app.log("GoBoard", "Sending to goEngine: "+command);
 				pInput.write(command);
 				pInput.flush();
+				game.setBlackPass(false);
 				if (getNext().contains("="))
 				{
 					click.play();
 					Gdx.app.log("GoBoard", "Command accepted");
 
-					if (getFreeMoves()<=0)
-					{
-						Gdx.app.log("GoBoard", "Sending to goEngine: genmove white");
-						pInput.write("genmove white\n");
-						pInput.flush();
-						Gdx.app.log("GoBoard", "getNexting");
-						String next = getNext();
-						Gdx.app.log("GoBoard", "getNext() complete.");
-						if (next.contains("="))
-						{
-							Gdx.app.log("GoBoard", "next contains =");
-							if (next.contains("resign"))
-							{
-								game.setWhiteResign(true);
-							}
-							else if (next.contains("PASS"))
-							{
-								game.setWhitePass(true);
-								Label passLabel = new Label("White passes.");
-								
-								
-							}
-							else
-								game.setWhitePass(false);
-						}
-						else
-						{
-							Gdx.app.log("GoBoard", "getNext() doesn't contain =");
-						}
-					}
-					else
-						setFreeMoves(getFreeMoves()-1);
+					genMoveWhite();
 
-					Gdx.app.log("GoBoard", "Updating board");
-					Gdx.app.log("GoBoard", "Sending command: list_stones black");
-					pInput.write("list_stones black\n");
-					pInput.flush();
-					Gdx.app.log("GoBoard", "Sending command: list_stones white");
-					pInput.write("list_stones white\n");
-					pInput.flush();					
-					game.updateBoard(getNext(),getNext());
-					pInput.write("estimate_score\n");
-					pInput.flush();
-					screen.updateScore(getNext());
-
+					updateBoard();
 				}
 				else
 					Gdx.app.log("GoBoard", "Command rejected");
@@ -291,6 +252,103 @@ public class GoBoard implements InputProcessor{
 			}
 		}
 		return true;
+	}
+	
+	public void moveBlackPass()
+	{
+		game.setBlackPass(true);
+		String command = "play black pass\n";
+		Gdx.app.log("GoBoard", "Sending to goEngine: "+command);
+		try {
+			pInput.write(command);
+			pInput.flush();
+			if (getNext().contains("="))
+			{
+				Gdx.app.log("GoBoard", "Command accepted");
+				genMoveWhite();
+				updateBoard();
+			}
+			else
+				Gdx.app.log("GoBoard", "Command rejected");
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void updateBoard()
+	{
+		Gdx.app.log("GoBoard", "Updating board");
+		Gdx.app.log("GoBoard", "Sending command: list_stones black");
+		try {
+			pInput.write("list_stones black\n");
+			pInput.flush();
+			Gdx.app.log("GoBoard", "Sending command: list_stones white");
+			pInput.write("list_stones white\n");
+			pInput.flush();					
+			game.updateBoard(getNext(),getNext());
+			pInput.write("estimate_score\n");
+			pInput.flush();
+			screen.updateScore(getNext());
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void genMoveWhite()
+	{
+		if (getFreeMoves()<=0)
+		{
+			Gdx.app.log("GoBoard", "Sending to goEngine: genmove white");
+			try {
+				pInput.write("genmove white\n");
+				pInput.flush();
+				Gdx.app.log("GoBoard", "getNexting");
+				String next = getNext();
+				Gdx.app.log("GoBoard", "getNext() complete.");
+				if (next.contains("="))
+				{
+					Gdx.app.log("GoBoard", "next contains =");
+					if (next.contains("resign"))
+					{
+						game.setWhiteResign(true);
+					}
+					else if (next.contains("PASS"))
+					{
+						game.setWhitePass(true);
+						Label passLabel = new Label("White passes.");
+						
+						
+					}
+					else
+						game.setWhitePass(false);
+				}
+				else
+				{
+					Gdx.app.log("GoBoard", "getNext() doesn't contain =");
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		else
+			setFreeMoves(getFreeMoves()-1);
 	}
 	
 	private String getNext() throws InterruptedException

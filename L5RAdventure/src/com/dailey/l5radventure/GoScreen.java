@@ -19,6 +19,9 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -67,16 +70,27 @@ public class GoScreen implements Screen, InputProcessor{
 			font.draw(batch, scoreSummary, 0, Gdx.graphics.getHeight()-30);
 
 		font.draw(batch, "Free Moves: "+board.getFreeMoves(), Gdx.graphics.getWidth()-300, Gdx.graphics.getHeight()-30);	
-		//font.draw(batch, board.getrX()+", "+board.getrY(), board.getpX(), board.getpY());
-		font.draw(batch, board.getProsMove(), board.getpX(), board.getpY());
-		
+		if (board.getGoban().getBoundingRectangle().contains(board.getpX(), board.getpY()))
+				font.draw(batch, board.getProsMove(), board.getpX(), board.getpY());
+		ui.act(delta);
+
 		batch.end();
 
-		ui.act(delta);
-		ui.draw();
-		Table.drawDebug(ui);
 		
-		//Gdx.app.log(L5RGame.LOG, "...rendered.");
+		if (board.getGame().whiteResign || (board.getGame().whitePass) && board.getGame().blackPass)
+		{
+			board.getGame().setOver(true);
+			LabelStyle style = new LabelStyle();
+			style.font = font;
+			Label result = new Label("You win!", style);
+			if (scoreSummary.split(" ")[0].equalsIgnoreCase("white"))
+				result = new Label("You lose!", skin);
+			result.setBounds(-30, Gdx.graphics.getHeight()/2, 60, 20);
+			result.addAction(Actions.moveTo(Gdx.graphics.getWidth()/2, result.getY(), 10));
+			ui.addActor(result);
+		}
+		ui.draw();
+
 		
 	}
 
@@ -104,6 +118,7 @@ public class GoScreen implements Screen, InputProcessor{
 		skin.add("blue", goAtlas.findRegion("blue"), TextureRegion.class);
 		skin.add("green", goAtlas.findRegion("green"), TextureRegion.class);
 		
+		
 		Table table = new Table();
 		table.setFillParent(true);
 		table.right();
@@ -114,6 +129,16 @@ public class GoScreen implements Screen, InputProcessor{
 		
 		
 		TextButton pass = new TextButton("Pass", style);
+		pass.addListener(new ChangeListener(){
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) 
+			{
+				board.moveBlackPass();
+				
+			}
+			
+		});
 		table.add(pass);
 
 		
@@ -258,6 +283,7 @@ public class GoScreen implements Screen, InputProcessor{
 		goAtlas.dispose();
 		batch.dispose();
 		font.dispose();
+		
 		
 	}
 

@@ -10,7 +10,7 @@ public class GoGame {
 	
 	int[][] board; //0 = blank 1 = black 2 = white
 	double score;  		//positive if black is ahead, negative if white is ahead
-	boolean blacksTurn, whiteResign, whitePass, blackPass;
+	boolean blacksTurn, whiteResign, whitePass, blackPass, over;
 	
 	public GoGame() 
 	{
@@ -19,6 +19,7 @@ public class GoGame {
 		whiteResign = false;
 		whitePass = false;
 		blackPass = false;
+		over = false;
 		
 		//clear the board
 		for (int i=0;i<board.length;i++)
@@ -31,6 +32,14 @@ public class GoGame {
 	
 	}
 	
+	public boolean isOver() {
+		return over;
+	}
+
+	public void setOver(boolean over) {
+		this.over = over;
+	}
+
 	public int[][] getBoard() {
 		return board;
 	}
@@ -78,6 +87,8 @@ public class GoGame {
 	public void setBlackPass(boolean blackPass) {
 		this.blackPass = blackPass;
 	}
+	
+
 
 	public int getCoord(int i, int j)
 	{
