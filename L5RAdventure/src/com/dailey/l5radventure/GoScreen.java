@@ -77,7 +77,7 @@ public class GoScreen implements Screen, InputProcessor{
 		batch.end();
 
 		
-		if (board.getGame().whiteResign || (board.getGame().whitePass) && board.getGame().blackPass)
+		if ((!board.getGame().isOver()) && (board.getGame().whiteResign || (board.getGame().whitePass) && board.getGame().blackPass))
 		{
 			board.getGame().setOver(true);
 			LabelStyle style = new LabelStyle();
@@ -86,7 +86,7 @@ public class GoScreen implements Screen, InputProcessor{
 			if (scoreSummary.split(" ")[0].equalsIgnoreCase("white"))
 				result = new Label("You lose!", skin);
 			result.setBounds(-30, Gdx.graphics.getHeight()/2, 60, 20);
-			result.addAction(Actions.moveTo(Gdx.graphics.getWidth()/2, result.getY(), 10));
+			result.addAction(Actions.moveTo(Gdx.graphics.getWidth()/2, result.getY(), 3));
 			ui.addActor(result);
 		}
 		ui.draw();
